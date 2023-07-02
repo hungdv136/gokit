@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  localstack:
+    container_name: gokit-localstack
+    image: localstack/localstack:0.12.13
+    healthcheck:
+      test: [ "CMD", "sh", "-c", "curl -f http://localstack:4566/health" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      - SERVICES=s3
+      - DEBUG=true

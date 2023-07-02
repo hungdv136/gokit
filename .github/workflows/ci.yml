@@ -1,0 +1,50 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: lint
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          cache: false
+        
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.53
+
+      - name: Run lint
+        run: make lint
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+          
+      - name: Setup for unit test
+        run: make test-up
+
+      - name: Check the deployed service
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: http://0.0.0.0:4566/health
+          max-attempts: 3 
+          retry-delay: 5s 
+
+      - name: Run unit test
+        run: make test
+
+      - name: Post run unit test
+        if: ${{ always() }}
+        run: make test-down

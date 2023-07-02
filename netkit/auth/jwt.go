@@ -1,0 +1,136 @@
+package auth
+
+import (
+	"context"
+	"crypto/rand"
+	"crypto/rsa"
+	"errors"
+
+	jwtgo "github.com/golang-jwt/jwt/v4"
+	"hungdv136/gokit/logger"
+)
+
+// Some default values
+const (
+	DefaultAlgorithm = "RS256"
+)
+
+// UserClaims is a custom claims that contains more user data beside standard claims's data
+type UserClaims struct {
+	jwtgo.RegisteredClaims
+	Name          string `json:"name"`
+	PictureURL    string `json:"picture_url"`
+	UserID        string `json:"user_id"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
+}
+
+type Verifier interface {
+	Verify(ctx context.Context, tokenString string) (*UserClaims, error)
+}
+
+type Signer interface {
+	Sign(ctx context.Context, claims *UserClaims) (string, error)
+}
+
+// Jwt is to sign and verify JWT
+type Jwt struct {
+	PrivateKey *rsa.PrivateKey
+	PublicKey  *rsa.PublicKey
+}
+
+func NewJWTFromPublicPem(pem string) (*Jwt, error) {
+	key, err := jwtgo.ParseRSAPublicKeyFromPEM([]byte(pem))
+	if err != nil {
+		return nil, err
+	}
+
+	return &Jwt{PublicKey: key}, nil
+}
+
+func NewJWTFromPrivatePem(pem string) (*Jwt, error) {
+	key, err := jwtgo.ParseRSAPrivateKeyFromPEM([]byte(pem))
+	if err != nil {
+		return nil, err
+	}
+
+	return &Jwt{PrivateKey: key, PublicKey: &key.PublicKey}, nil
+}
+
+// NewRandomJwt generates random RSA keys for RSA algorithm
+func NewRandomJwt() (*Jwt, error) {
+	k, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Jwt{PrivateKey: k, PublicKey: &k.PublicKey}, nil
+}
+
+// Sign creates a new JWT token signed by RSA method
+func (a *Jwt) Sign(ctx context.Context, claims *UserClaims) (string, error) {
+	if a.PrivateKey == nil {
+		err := errors.New("missing private key")
+		logger.Error(ctx, err)
+		return "", err
+	}
+
+	token := jwtgo.New(jwtgo.GetSigningMethod(DefaultAlgorithm))
+	token.Claims = claims
+	signed, err := token.SignedString(a.PrivateKey)
+	if err != nil {
+		logger.Error(ctx, err)
+		return "", err
+	}
+
+	return signed, nil
+}
+
+// Verify checks if provided token string is valid or not
+// claims is always returned to respect the jwtgo's behavior
+// caller should have decision depend on the error type
+func (a *Jwt) Verify(ctx context.Context, tokenString string) (*UserClaims, error) {
+	keyFunc := func(token *jwtgo.Token) (interface{}, error) {
+		return a.PublicKey, nil
+	}
+
+	var claims UserClaims
+	if _, err := jwtgo.ParseWithClaims(tokenString, &claims, keyFunc); err != nil {
+		if IsExpiredJWTError(err) {
+			logger.Warn(ctx, err)
+			return &claims, err
+		}
+
+		logger.Error(ctx, err, tokenString)
+		return &claims, err
+	}
+
+	return &claims, nil
+}
+
+// IsExpiredJWTError checks if err is JWT ValidationErrorExpired
+func IsExpiredJWTError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	switch v := err.(type) {
+	case *jwtgo.ValidationError:
+		return (v != nil) && (v.Errors&jwtgo.ValidationErrorExpired != 0)
+	default:
+		return false
+	}
+}
+
+// IsJWTError checks whether the error is JWT ValidationError and matches target or not
+func IsJWTError(err, target error) bool {
+	var jwtValidationErr *jwtgo.ValidationError
+	if !errors.As(err, &jwtValidationErr) {
+		return false
+	}
+	if target == nil {
+		return false
+	}
+
+	return jwtValidationErr.Is(target)
+}
