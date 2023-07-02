@@ -35,10 +35,8 @@ jobs:
       - name: Setup for unit test
         run: make test-up
 
-      - name: Sleep for 5 seconds
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '5s'
+      - name: go mod
+        run: go mod tidy
 
       - name: Run unit test
         run: make test
