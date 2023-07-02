@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/hungdv136/gokit/actions/workflows/ci.yml/badge.svg)](https://github.com/hungdv136/gokit/actions/workflows/ci.yml)
 
-This consists a set of opinionated libraries in Golang. Please consider to use it in your project
+This consists a set of **opinionated** libraries in Golang
 
 ## Install 
 
