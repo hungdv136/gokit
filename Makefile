@@ -1,10 +1,6 @@
 PWD = $(shell pwd)
 
-all: fmt lint test 
-
-install:
-	@brew install librdkafka
-	@go install github.com/golangci/golangci-lint@latest
+all: fmt lint test
 	
 fmt:
 	@echo "==> Formatting source code..."
