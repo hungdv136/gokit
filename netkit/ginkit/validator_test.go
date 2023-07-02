@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hungdv136/gokit/netkit"
+	"github.com/hungdv136/gokit/netkit/testkit"
+	"github.com/hungdv136/gokit/types"
 	"github.com/stretchr/testify/require"
-	"hungdv136/gokit/netkit"
-	"hungdv136/gokit/netkit/testkit"
-	"hungdv136/gokit/types"
 )
 
 type (

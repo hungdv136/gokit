@@ -8,12 +8,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/hungdv136/gokit/logger"
+	"github.com/hungdv136/gokit/netkit"
+	"github.com/hungdv136/gokit/netkit/auth"
+	"github.com/hungdv136/gokit/netkit/testkit"
+	"github.com/hungdv136/gokit/types"
 	"github.com/stretchr/testify/require"
-	"hungdv136/gokit/logger"
-	"hungdv136/gokit/netkit"
-	"hungdv136/gokit/netkit/auth"
-	"hungdv136/gokit/netkit/testkit"
-	"hungdv136/gokit/types"
 )
 
 func TestRecoveryMiddleware(t *testing.T) {

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"hungdv136/gokit/logger"
-	"hungdv136/gokit/netkit"
+	"github.com/hungdv136/gokit/logger"
+	"github.com/hungdv136/gokit/netkit"
 )
 
 // SendJSON sends JSON

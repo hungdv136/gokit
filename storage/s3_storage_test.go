@@ -8,8 +8,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/google/uuid"
+	"github.com/hungdv136/gokit/util"
 	"github.com/stretchr/testify/require"
-	"hungdv136/gokit/util"
 )
 
 func TestS3Storage(t *testing.T) {

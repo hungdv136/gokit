@@ -3,7 +3,7 @@ package util
 import (
 	"context"
 
-	"hungdv136/gokit/logger"
+	"github.com/hungdv136/gokit/logger"
 )
 
 // CloseSilently closes and write log if an error occurs

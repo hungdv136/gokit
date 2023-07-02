@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"hungdv136/gokit/logger"
+	"github.com/hungdv136/gokit/logger"
 
 	"github.com/gin-gonic/gin"
 )

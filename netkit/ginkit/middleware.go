@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hungdv136/gokit/logger"
+	"github.com/hungdv136/gokit/netkit"
+	"github.com/hungdv136/gokit/netkit/auth"
+	"github.com/hungdv136/gokit/types"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
-	"hungdv136/gokit/logger"
-	"hungdv136/gokit/netkit"
-	"hungdv136/gokit/netkit/auth"
-	"hungdv136/gokit/types"
 )
 
 // RequestIDMiddleware adds X-Request-ID value to request, response and save to context variable

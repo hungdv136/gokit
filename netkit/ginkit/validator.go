@@ -11,9 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"hungdv136/gokit/logger"
-	"hungdv136/gokit/netkit"
-	"hungdv136/gokit/types"
+	"github.com/hungdv136/gokit/logger"
+	"github.com/hungdv136/gokit/netkit"
+	"github.com/hungdv136/gokit/types"
 )
 
 const fieldMsg = "invalid '%s' tag"

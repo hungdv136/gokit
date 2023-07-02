@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"hungdv136/gokit/logger"
-	"hungdv136/gokit/util"
+	"github.com/hungdv136/gokit/logger"
+	"github.com/hungdv136/gokit/util"
 )
 
 var (

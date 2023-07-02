@@ -7,7 +7,7 @@ import (
 	"errors"
 
 	jwtgo "github.com/golang-jwt/jwt/v4"
-	"hungdv136/gokit/logger"
+	"github.com/hungdv136/gokit/logger"
 )
 
 // Some default values

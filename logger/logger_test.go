@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/hungdv136/gokit/types"
 	"github.com/stretchr/testify/require"
-	"hungdv136/gokit/types"
 )
 
 func TestLogger(t *testing.T) {

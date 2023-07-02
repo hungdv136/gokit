@@ -1,4 +1,4 @@
-module hungdv136/gokit
+module github.com/hungdv136/gokit
 
 go 1.20
 

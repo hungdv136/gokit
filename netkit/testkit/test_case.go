@@ -9,9 +9,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"hungdv136/gokit/netkit"
-	"hungdv136/gokit/types"
-	"hungdv136/gokit/util"
+	"github.com/hungdv136/gokit/netkit"
+	"github.com/hungdv136/gokit/types"
+	"github.com/hungdv136/gokit/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"

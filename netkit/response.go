@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"hungdv136/gokit/logger"
+	"github.com/hungdv136/gokit/logger"
 )
 
 // Response is generic response structure

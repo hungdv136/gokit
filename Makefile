@@ -15,7 +15,7 @@ test:
 	@echo "==> Running tests...$(PWD)"
 	@docker exec gokit-localstack aws --no-sign-request --endpoint-url=http://localstack:4566 s3 mb s3://test
 	@go clean -testcache
-	@go test -tags=unit_test -vet=off `go list ./... | grep -v /lib/test` -p 1 -timeout 30s --cover -coverprofile cover.out.tmp
+	@go test -tags=unit_test -vet=off `go list ./... | grep -v /lib/test` -p 1 -timeout 30s -race --cover -coverprofile cover.out.tmp
 	@cat cover.out.tmp | grep -v ".mock.go" > cover.out && echo "Total Test Coverage: " && go tool cover -func cover.out | tail -1 | tail -c 6 && rm cover.out cover.out.tmp
 
 test-up:
