@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/hungdv136/gokit/actions/workflows/ci.yml/badge.svg)](https://github.com/hungdv136/gokit/actions/workflows/ci.yml)
 
-This consists a set of **opinionated** libraries to build **my personal** Rest API in Golang
+This consists a set of **opinionated** libraries (not framework) to build **my personal** Rest API in Golang
 
 ## Install 
 

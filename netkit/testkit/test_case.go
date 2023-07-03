@@ -145,7 +145,16 @@ func (tc *TestCase) WithToken(token string) *TestCase {
 	return tc.WithHeader(netkit.HeaderAuthorization, netkit.TokenTypeBearer+" "+token)
 }
 
+// Execute executes test case
+func (tc *TestCase) Execute(t testing.TB) *http.Response {
+	res, err := netkit.SendRequest(tc.Request)
+	require.NoError(t, err, tc.Request.URL.RawPath)
+	require.Equal(t, tc.Assertion.StatusCode, res.StatusCode)
+	return res
+}
+
 // TestGin executes test case with gin engine
+// Parse the response to internal structure
 func TestGin[Body any](t testing.TB, tc *TestCase, engine *gin.Engine) *netkit.Response[netkit.InternalBody[Body]] {
 	ctx := context.Background()
 	recorder := NewResponseRecorder()
@@ -162,12 +171,15 @@ func TestGin[Body any](t testing.TB, tc *TestCase, engine *gin.Engine) *netkit.R
 	return res
 }
 
-// Execute performs HTTP request to the target server
+// Execute performs HTTP request to the target server. The request URL must contain remote server address
+// Parse the response to internal structure
 func Execute[Body any](t testing.TB, tc *TestCase) *netkit.Response[netkit.InternalBody[Body]] {
 	ctx := context.Background()
 	res, err := netkit.SendRequest(tc.Request)
 	require.NoError(t, err, tc.Request.URL.RawPath)
 	defer res.Body.Close()
+
+	require.Equal(t, tc.Assertion.StatusCode, res.StatusCode)
 
 	parsedRes, err := netkit.ParseResponse[netkit.InternalBody[Body]](ctx, res)
 	require.NoError(t, err)
