@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"strings"
@@ -22,6 +23,14 @@ var (
 	}
 )
 
+// UploadOptions upload options
+type UploadOptions struct {
+	Method    string            // Default: POST
+	FieldName string            // Default: file
+	FileName  string            // Default: UUID
+	Fields    map[string]string // Default: Empty
+}
+
 // SendRequest sends general request to a URL and returns HTTP response
 func SendRequest(r *http.Request) (*http.Response, error) {
 	if id := logger.GetID(r.Context()); len(id) > 0 {
@@ -37,22 +46,32 @@ func SendRequest(r *http.Request) (*http.Response, error) {
 	return response, nil
 }
 
-// NewUploadRequest create a new http upload request
-func NewUploadRequest(ctx context.Context, url string, file []byte, fields map[string]string) (*http.Request, error) {
+// NewUploadRequest create a new http upload file request
+func NewUploadRequest(ctx context.Context, url string, reader io.Reader, modifiers ...func(*UploadOptions)) (*http.Request, error) {
+	options := &UploadOptions{
+		Method:    http.MethodPost,
+		FieldName: "file",
+		FileName:  uuid.NewString(),
+	}
+
+	for _, modifier := range modifiers {
+		modifier(options)
+	}
+
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("file", uuid.NewString())
+	part, err := writer.CreateFormFile(options.FieldName, options.FileName)
 	if err != nil {
 		logger.Error(ctx, err)
 		return nil, err
 	}
 
-	if _, err := part.Write(file); err != nil {
+	if _, err := io.Copy(part, reader); err != nil {
 		logger.Error(ctx, err)
 		return nil, err
 	}
 
-	for key, val := range fields {
+	for key, val := range options.Fields {
 		if err := writer.WriteField(key, val); err != nil {
 			logger.Error(ctx, err)
 			return nil, err
@@ -64,7 +83,7 @@ func NewUploadRequest(ctx context.Context, url string, file []byte, fields map[s
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, body)
+	req, err := http.NewRequestWithContext(ctx, options.Method, url, body)
 	if err != nil {
 		logger.Error(ctx, err)
 		return nil, err

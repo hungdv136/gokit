@@ -2,6 +2,7 @@ package netkit
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/google/uuid"
@@ -12,9 +13,9 @@ import (
 func TestSendJSON(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
 	server := rio.NewLocalServerWithReporter(t)
 
-	ctx := context.Background()
 	type (
 		ResponseBody struct {
 			Field string `json:"field"`
@@ -49,9 +50,9 @@ func TestSendJSON(t *testing.T) {
 func TestGetRequest(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
 	server := rio.NewLocalServerWithReporter(t)
 
-	ctx := context.Background()
 	type ResponseBody struct {
 		Field string `json:"field"`
 	}
@@ -70,4 +71,27 @@ func TestGetRequest(t *testing.T) {
 	require.NotNil(t, res)
 	require.Equal(t, 200, res.StatusCode)
 	require.Equal(t, resBody.Field, res.Body.Field)
+}
+
+func TestUploadRequest(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+
+	server := rio.NewLocalServerWithReporter(t)
+	require.NoError(t, rio.NewStub().
+		For("POST", rio.Contains("/upload")).
+		WillReturn(rio.NewResponse()).
+		Send(ctx, server))
+
+	file, err := os.Open("request_test.go")
+	require.NoError(t, err)
+
+	req, err := NewUploadRequest(ctx, server.GetURL(ctx)+"/upload", file)
+	require.NoError(t, err)
+
+	res, err := SendRequest(req)
+	require.NoError(t, err)
+	require.Equal(t, 200, res.StatusCode)
+	require.NoError(t, res.Body.Close())
 }

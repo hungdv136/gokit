@@ -31,7 +31,7 @@ func TestUserJWT(t *testing.T) {
 	require.NotEmpty(t, tokenString)
 	require.True(t, len(tokenString) <= 1024)
 
-	claims, err := signer.Verify(context.Background(), tokenString)
+	claims, err := signer.Verify(ctx, tokenString)
 	require.NoError(t, err)
 	require.NotNil(t, claims)
 	require.NotEmpty(t, claims.ID)

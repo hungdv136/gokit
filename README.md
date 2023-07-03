@@ -2,14 +2,14 @@
 
 [![CI](https://github.com/hungdv136/gokit/actions/workflows/ci.yml/badge.svg)](https://github.com/hungdv136/gokit/actions/workflows/ci.yml)
 
-This consists a set of **opinionated** libraries to build Rest API in Golang
+This consists a set of **opinionated** libraries to build **my personal** Rest API in Golang
 
 ## Install 
 
 - Docker
 - golangci-lint: `brew install golangci-lint`
 
-## Run unit test
+## Development
 
 Run this command to setup environment
 

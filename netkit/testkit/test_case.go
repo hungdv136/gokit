@@ -48,7 +48,8 @@ func NewResponseRecorder() *ResponseRecorder {
 
 // NewTestCase returns a new HTTP test case. Panic if error
 func NewTestCase(name string, method string, path string, expectedStatus int, expectedVerdict string) *TestCase {
-	r, err := http.NewRequest(method, path, nil)
+	ctx := context.Background()
+	r, err := http.NewRequestWithContext(ctx, method, path, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -66,9 +67,11 @@ func NewTestCase(name string, method string, path string, expectedStatus int, ex
 }
 
 // NewUploadTestCase creates new upload test case
-func NewUploadTestCase(name string, path string, file []byte, fields map[string]string, expectedStatus int, expectedVerdict string) *TestCase {
+func NewUploadTestCase(name string, path string, reader io.Reader, fields map[string]string, expectedStatus int, expectedVerdict string) *TestCase {
 	ctx := context.Background()
-	r, err := netkit.NewUploadRequest(ctx, path, file, fields)
+	r, err := netkit.NewUploadRequest(ctx, path, reader, func(uo *netkit.UploadOptions) {
+		uo.Fields = fields
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -110,7 +113,7 @@ func (tc *TestCase) WithQuery(queries interface{}) *TestCase {
 	return tc
 }
 
-// WithBody sets request body
+// WithBody converts input to JSON and sets to request body
 func (tc *TestCase) WithBody(body interface{}) *TestCase {
 	data, err := json.Marshal(body)
 	if err != nil {
@@ -128,7 +131,7 @@ func (tc *TestCase) WithBody(body interface{}) *TestCase {
 		return io.NopCloser(&r), nil
 	}
 
-	return tc
+	return tc.WithHeader("Content-Type", "application/json")
 }
 
 // WithHeader adds header
@@ -139,7 +142,7 @@ func (tc *TestCase) WithHeader(k, v string) *TestCase {
 
 // WithToken sets bearer token
 func (tc *TestCase) WithToken(token string) *TestCase {
-	return tc.WithHeader(netkit.HeaderAuthorization, "Bearer "+token)
+	return tc.WithHeader(netkit.HeaderAuthorization, netkit.TokenTypeBearer+" "+token)
 }
 
 // TestGin executes test case with gin engine
@@ -157,4 +160,17 @@ func TestGin[Body any](t testing.TB, tc *TestCase, engine *gin.Engine) *netkit.R
 	require.Equal(t, tc.Assertion.Verdict, res.Body.Verdict)
 
 	return res
+}
+
+// Execute performs HTTP request to the target server
+func Execute[Body any](t testing.TB, tc *TestCase) *netkit.Response[netkit.InternalBody[Body]] {
+	ctx := context.Background()
+	res, err := netkit.SendRequest(tc.Request)
+	require.NoError(t, err, tc.Request.URL.RawPath)
+	defer res.Body.Close()
+
+	parsedRes, err := netkit.ParseResponse[netkit.InternalBody[Body]](ctx, res)
+	require.NoError(t, err)
+	require.Equal(t, tc.Assertion.Verdict, parsedRes.Body.Verdict)
+	return parsedRes
 }
