@@ -145,7 +145,8 @@ func (tc *TestCase) WithToken(token string) *TestCase {
 	return tc.WithHeader(netkit.HeaderAuthorization, netkit.TokenTypeBearer+" "+token)
 }
 
-// Execute executes test case
+// Execute performs HTTP request to the target server
+// The request URL must contain remote server address
 func (tc *TestCase) Execute(t testing.TB) *http.Response {
 	res, err := netkit.SendRequest(tc.Request)
 	require.NoError(t, err, tc.Request.URL.RawPath)
@@ -171,7 +172,8 @@ func TestGin[Body any](t testing.TB, tc *TestCase, engine *gin.Engine) *netkit.R
 	return res
 }
 
-// Execute performs HTTP request to the target server. The request URL must contain remote server address
+// Execute performs HTTP request to the target server
+// The request URL must contain remote server address
 // Parse the response to internal structure
 func Execute[Body any](t testing.TB, tc *TestCase) *netkit.Response[netkit.InternalBody[Body]] {
 	ctx := context.Background()
