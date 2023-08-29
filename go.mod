@@ -1,12 +1,12 @@
 module github.com/hungdv136/gokit
 
-go 1.20
+go 1.21
 
 require (
 	github.com/aws/aws-sdk-go v1.44.282
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/validator/v10 v10.14.0
-	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/uuid v1.3.0
 	github.com/hungdv136/rio v1.2.1
 	github.com/rs/zerolog v1.29.1
